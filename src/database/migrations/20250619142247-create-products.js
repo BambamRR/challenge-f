@@ -59,7 +59,7 @@ module.exports = {
       fields: ["stock"],
       type: "check",
       name: "products_stock_range",
-      where: Sequelize.literal,
+      where: Sequelize.literal('stock BETWEEN 0 AND 999999'),
     });
   },
 
