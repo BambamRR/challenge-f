@@ -13,6 +13,15 @@ class ProductController {
       res.status(400).send({ message: error.message });
     }
   }
+
+  static async findProductById(req, res) {
+    try {
+      const product = await productService.findProductById(req.params);
+      res.status(201).send(product);
+    } catch (error) {
+      res.status(404).send({ message: error.message });
+    }
+  }
 }
 
 module.exports = ProductController;
