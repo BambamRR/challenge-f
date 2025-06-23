@@ -126,7 +126,6 @@ class ProductService {
     });
 
     return {
-      ...filters,
       data,
       meta: {
         page: filters.page,
@@ -137,8 +136,12 @@ class ProductService {
     };
   }
 
-  async findProductById(id) {
-    return this._getProducts(id);
+  async findProductById(query) {
+    return await this._getProducts(query);
+  }
+
+  async findAllProducts(query) {
+    return await this._getProducts(query);
   }
 }
 

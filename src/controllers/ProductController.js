@@ -22,6 +22,16 @@ class ProductController {
       res.status(404).send({ message: error.message });
     }
   }
+
+  static async findAllProducts(req, res) {
+    try {
+      const product = await productService.findAllProducts(req.params);
+      res.status(201).send(product);
+    } catch (error) {
+      res.status(404).send({ message: error.message });
+    }
+  }
+
 }
 
 module.exports = ProductController;
