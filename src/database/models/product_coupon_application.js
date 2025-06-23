@@ -30,12 +30,10 @@ module.exports = (sequelize, DataTypes) => {
   ProductCouponApplication.associate = (models) => {
     ProductCouponApplication.belongsTo(models.Product, {
       foreignKey: "product_id",
-      as: "product",
     });
 
     ProductCouponApplication.belongsTo(models.Coupon, {
       foreignKey: "coupon_id",
-      as: "coupon",
     });
   };
 
