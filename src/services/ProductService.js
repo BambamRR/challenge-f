@@ -1,5 +1,5 @@
-const { Op } = require("sequelize");
-const { Product, ProductCouponApplication } = require("../database/models");
+const { Op, Model } = require("sequelize");
+const { Product, ProductCouponApplication, Coupon } = require("../database/models");
 
 class ProductService {
   async createProduct(dto) {
@@ -71,7 +71,7 @@ class ProductService {
         model: ProductCouponApplication,
         required: filters.hasDiscount || filters.withCouponApplied,
         where: { removed_at: null },
-        include: [{ model: withCouponApplied, required: true }],
+        include: [{ model: Coupon, required: true }],
       });
     }
 
@@ -84,9 +84,11 @@ class ProductService {
       limit: filters.limit,
       offset,
       order: [[filters.sortBy, filters.sortOrder.toUpperCase()]],
+      distinct: true,
+      subQuery: false
     });
 
-    if (!query || result.lentgh === 0) {
+    if (!query || result.rows.length === 0) {
       throw new Error("No data with these parameters");
     }
 
@@ -126,6 +128,7 @@ class ProductService {
     });
 
     return {
+      ...filters,
       data,
       meta: {
         page: filters.page,
