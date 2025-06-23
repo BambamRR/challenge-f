@@ -25,7 +25,7 @@ class ProductController {
 
   static async findAllProducts(req, res) {
     try {
-      const product = await productService.findAllProducts(req.params);
+      const product = await productService.findAllProducts(req.query);
       res.status(201).send(product);
     } catch (error) {
       res.status(404).send({ message: error.message });
