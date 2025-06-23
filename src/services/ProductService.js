@@ -33,7 +33,7 @@ class ProductService {
       sortOrder = "asc",
     } = query;
 
-    console.log("ID AQUI : ", id)
+    console.log("ID AQUI : ", id);
 
     const filters = {
       page: +page,
@@ -90,11 +90,55 @@ class ProductService {
       throw new Error("No data with these parameters");
     }
 
-    return result;
+    const data = result.rows.map((product) => {
+      const applicated = product.ProductCouponApplication?.[0];
+      const coupon = applicated?.Coupon;
+      let finalPrice = parseFloat(product.price);
+      let discount = null;
+
+      if (coupon) {
+        if (coupon.type === "percent") {
+          finalPrice = finalPrice * (1 - coupon.value / 100);
+        } else {
+          finalPrice = finalPrice - parseFloat(coupon.value);
+        }
+
+        discount = {
+          type: coupon.type,
+          value: coupon.value,
+          applied_at: applicated.applied_at,
+        };
+      }
+
+      return {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        stock: product.stock,
+        is_out_of_stock: product.stock === 0,
+        price: parseFloat(product.price),
+        finalPrice: parseFloat(finalPrice.toFixed(2)),
+        discount,
+        hasCouponApplied: !!coupon,
+        created_at: product.created_at,
+        updated_at: product.updated_at,
+      };
+    });
+
+    return {
+      ...filters,
+      data,
+      meta: {
+        page: filters.page,
+        limit: filters.limit,
+        totalItems: result.count,
+        totalPages: Math.ceil(result.count / filters.limit),
+      },
+    };
   }
 
   async findProductById(id) {
-    return this._getProducts(id)
+    return this._getProducts(id);
   }
 }
 
