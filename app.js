@@ -7,7 +7,9 @@ const conn = require("./src/database/conn");
 
 const routes = require("./src/routes/index");
 
-app.use(express.json());
+app.use(express.json({
+  type: ['application/json', 'application/json-patch+json']
+}));
 
 app.use("/api/v1", routes);
 
