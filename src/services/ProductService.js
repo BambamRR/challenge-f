@@ -1,5 +1,6 @@
-const { Op, Model } = require("sequelize");
+const { Op, Model, json, where } = require("sequelize");
 const { Product, ProductCouponApplication, Coupon } = require("../database/models");
+const jsonpatch = require("fast-json-patch");
 
 class ProductService {
   async createProduct(dto) {
@@ -127,8 +128,8 @@ class ProductService {
 
     if (!query || result.rows.length === 0) {
       const error = new Error("No data with these parameters");
-      error.status(404)
-      throw error
+      error.status = 404;
+      throw error;
     }
 
     const data = result.rows.map((product) => {
@@ -197,6 +198,20 @@ class ProductService {
 
     await product.destroy();
 
+    return;
+  }
+
+  async patchProduct(id, patch) {
+    const product = await Product.findByPk(id);
+    if (!product) {
+      const err = new Error(`Product with id ${id} not found`);
+      err.status = 404;
+      throw err;
+    }
+
+    const current = product.get({ plain: true });
+    const { newDocument } = jsonpatch.applyPatch(current, patch, true);
+    await Product.update(newDocument, { where: { id } });
     return;
   }
 }

@@ -6,6 +6,7 @@ router
 .post('/', ProductController.createProduct)
 .get('/:id', ProductController.findProductById)
 .delete('/:id', ProductController.deleteProduct)
+.patch('/:id', ProductController.patchProduct)
 .get('/', ProductController.findAllProducts)
 
 

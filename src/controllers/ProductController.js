@@ -45,12 +45,19 @@ class ProductController {
       res.status(500).json({ message: error.message });
     }
   }
-  static async editProduct(req, res) {
+  static async patchProduct(req, res) {
     try {
-      const product = await productService.editProduct(req.body)
-      res.status(200).json(product)
+      const id = req.params.id;
+      const patch = req.body;
+
+      if (!Array.isArray(patch)) {
+        return res.status(400).json({ message: "Invalid patch format" });
+      }
+
+      const product = await productService.patchProduct(id, patch);
+      res.status(200).json(product);
     } catch (error) {
-       res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 }
