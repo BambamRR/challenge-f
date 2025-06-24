@@ -3,10 +3,47 @@ const { Product, ProductCouponApplication, Coupon } = require("../database/model
 
 class ProductService {
   async createProduct(dto) {
-    const { name, description, price, stock } = dto;
+    let { name, description, price, stock } = dto;
     if (!name || !price || !stock || !description) {
       throw new Error("Missing required fields: name, description, price or stock");
     }
+
+    name = name?.trim().replace(/\s+/g, " ");
+    if (!name) {
+      throw new Error('Field "name" is required');
+    }
+    if (name.length < 3 || name.length > 100) {
+      throw new Error('Field "name" must be between 3 and 100 characters');
+    }
+    if (!/^[a-zA-Z0-9\s\-_,.]+$/.test(name)) {
+      throw new Error('Field "name" contains invalid characters');
+    }
+    //validation for unique name
+    const exists = await Product.findOne({
+      where: { name: { [Op.iLike]: name } }
+    });
+    if (exists) {
+      throw new Error('A product with this name already exists');
+    }
+
+     if (description.length > 300) {
+      throw new Error('Field "description" must be at most 300 characters');
+    }
+    //have a check in database with thi rule, see migration create-product
+    stock = Number(stock);
+    if (!Number.isInteger(stock) || stock < 0 || stock > 999999) {
+      throw new Error('Field "stock" must be an integer between 0 and 999999');
+    }
+
+    if (typeof price === 'string') {
+       price = price.replace(/\./g, '').replace(',', '.');
+    }
+
+    price = parseFloat(price);
+    if (isNaN(price) || price < 0.01 || price > 1000000) {
+      throw new Error('Field "price" must be between 0.01 and 1 000 000');
+    }
+
     const product = await Product.create({
       name,
       description,
@@ -85,7 +122,7 @@ class ProductService {
       offset,
       order: [[filters.sortBy, filters.sortOrder.toUpperCase()]],
       distinct: true,
-      subQuery: false
+      subQuery: false,
     });
 
     if (!query || result.rows.length === 0) {
