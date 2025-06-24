@@ -126,7 +126,9 @@ class ProductService {
     });
 
     if (!query || result.rows.length === 0) {
-      throw new Error("No data with these parameters");
+      const error = new Error("No data with these parameters");
+      error.status(404)
+      throw error
     }
 
     const data = result.rows.map((product) => {
