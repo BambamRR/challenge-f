@@ -20,13 +20,13 @@ class ProductService {
     }
     //validation for unique name
     const exists = await Product.findOne({
-      where: { name: { [Op.iLike]: name } }
+      where: { name: { [Op.iLike]: name } },
     });
     if (exists) {
-      throw new Error('A product with this name already exists');
+      throw new Error("A product with this name already exists");
     }
 
-     if (description.length > 300) {
+    if (description.length > 300) {
       throw new Error('Field "description" must be at most 300 characters');
     }
     //have a check in database with thi rule, see migration create-product
@@ -35,8 +35,8 @@ class ProductService {
       throw new Error('Field "stock" must be an integer between 0 and 999999');
     }
 
-    if (typeof price === 'string') {
-       price = price.replace(/\./g, '').replace(',', '.');
+    if (typeof price === "string") {
+      price = price.replace(/\./g, "").replace(",", ".");
     }
 
     price = parseFloat(price);
@@ -182,6 +182,20 @@ class ProductService {
 
   async findAllProducts(query) {
     return await this._getProducts(query);
+  }
+
+  async deleteProduct(query) {
+    const { id } = query;
+    const product = await Product.findByPk(id);
+    if (!product) {
+      const error = new Error(`Product with id ${id} not found`);
+      error.status = 404;
+      throw error;
+    }
+
+    await product.destroy();
+
+    return;
   }
 }
 
