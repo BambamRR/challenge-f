@@ -8,38 +8,49 @@ class ProductController {
         res.status(400).send({ message: "Request body is missing." });
       }
       const product = await productService.createProduct(req.body);
-      res.status(201).send(product);
+      res.status(201).json(product);
     } catch (error) {
-      res.status(500).send({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
 
   static async findProductById(req, res) {
     try {
       const product = await productService.findProductById(req.params);
-      res.status(200).send(product);
+      res.status(200).json(product);
     } catch (error) {
-      res.status(500).send({ message: error.message });
+      if (error.status === 404) {
+        res.status(404).json({ message: error.message });
+      }
+      res.status(500).json({ message: error.message });
     }
   }
 
   static async findAllProducts(req, res) {
     try {
       const product = await productService.findAllProducts(req.query);
-      res.status(200).send(product);
+      res.status(200).json(product);
     } catch (error) {
-      res.status(500).send({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   }
   static async deleteProduct(req, res) {
     try {
       const product = await productService.deleteProduct(req.params);
-      res.status(200).send(product);
+      res.status(200).json(product);
     } catch (error) {
       if (error.status === 404) {
-        return res.status(404).send({ message: error.message });
+        return res.status(404).json({ message: error.message });
       }
-      res.status(500).send({ message: error.message });
+      res.status(500).json({ message: error.message });
+    }
+  }
+  static async editProduct(req, res) {
+    try {
+      const product = await productService.editProduct(req.body)
+      res.status(200).json(product)
+    } catch (error) {
+       res.status(500).json({ message: error.message });
     }
   }
 }
